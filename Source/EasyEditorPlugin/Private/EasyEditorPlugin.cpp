@@ -261,7 +261,7 @@ void FEasyEditorPluginModule::InitJsEnv()
 				TArray<uint8> Source;
 				if (FFileHelper::LoadFileToArray(Source, *InPath))
 				{
-					JsEnv->ReloadSource(InPath, std::string((const char*) Source.GetData(), Source.Num()));
+					JsEnv->ReloadSource(InPath, puerts::PString((const char*) Source.GetData(), Source.Num()));
 				}
 				else
 				{
