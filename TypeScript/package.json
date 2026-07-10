@@ -1,0 +1,14 @@
+{
+  "name": "@matrix/puerts-runtime-source",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "clean": "node -e \"require('fs').rmSync('../Content/JavaScript/node_modules/@matrix/puerts-runtime',{recursive:true,force:true});require('fs').rmSync('../Typing/@matrix/puerts-runtime',{recursive:true,force:true})\"",
+    "build": "npm run clean && tsc -p tsconfig.json && node scripts/write-runtime-package.mjs",
+    "test": "tsc -p tsconfig.test.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "5.9.2"
+  }
+}

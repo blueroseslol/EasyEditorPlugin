@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "strict": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "sourceMap": true,
+    "rootDir": "src",
+    "outDir": "../Content/JavaScript/node_modules/@matrix/puerts-runtime",
+    "declaration": true,
+    "declarationDir": "../Typing/@matrix/puerts-runtime",
+    "typeRoots": ["./node_modules/@types", "../../Puerts/Typing"]
+  },
+  "include": ["src/index.ts", "src/runtime.ts", "src/EditorMain.ts"]
+}
