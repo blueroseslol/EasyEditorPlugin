@@ -21,5 +21,10 @@ public class PuertsRuntimePlugin : ModuleRules
         });
 
         CppCompileWarningSettings.UndefinedIdentifierWarningLevel = WarningLevel.Off;
+
+        RuntimeDependencies.Add("$(PluginDir)/Content/JavaScript/...*.js", StagedFileType.NonUFS);
+        RuntimeDependencies.Add("$(PluginDir)/Content/JavaScript/...*.mjs", StagedFileType.NonUFS);
+        RuntimeDependencies.Add("$(PluginDir)/Content/JavaScript/...*.cjs", StagedFileType.NonUFS);
+        RuntimeDependencies.Add("$(PluginDir)/Content/JavaScript/...*.json", StagedFileType.NonUFS);
     }
 }

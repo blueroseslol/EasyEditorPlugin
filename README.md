@@ -148,3 +148,12 @@ ImGui.End();
 * [Puerts](https://github.com/Tencent/puerts)
 * [UEImgui](https://github.com/ZhuRong-HomoStation/UEImgui)
 * [EasyEditor_ImGui](https://github.com/puerts/EasyEditor_ImGui)
+
+## Gameplay Runtime TypeScript
+
+可复用 gameplay TypeScript 位于插件的 `TypeScript/src`，构建后作为
+`@matrix/puerts-runtime` 包输出到插件 `Content/JavaScript/node_modules`。
+消费项目只需在自己的 `Main.ts` 中导入和调用该包，不需要复制插件实现。
+
+插件 JavaScript 以 NonUFS loose files 进入 packaged build，保留插件相对目录。
+运行时代码不得使用 Node.js API；Shipping 不依赖 source map，`.map` 文件不会被 staging。
