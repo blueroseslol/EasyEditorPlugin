@@ -4,7 +4,7 @@ public class PuertsEditorPlugin : ModuleRules
 {
     public PuertsEditorPlugin(ReadOnlyTargetRules Target) : base(Target)
     {
-        PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
+        PCHUsage = PCHUsageMode.NoPCHs;
 
         PublicDependencyModuleNames.AddRange(new[]
         {
