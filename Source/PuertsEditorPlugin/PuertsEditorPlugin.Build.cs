@@ -22,6 +22,7 @@ public class PuertsEditorPlugin : ModuleRules
             "UnrealEd",
             "LevelEditor",
             "ContentBrowserData",
+            "DirectoryWatcher",
             "Projects",
             "JsEnv"
         });

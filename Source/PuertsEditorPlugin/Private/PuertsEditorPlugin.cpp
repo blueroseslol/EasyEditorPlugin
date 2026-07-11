@@ -90,12 +90,25 @@ public:
         char GCFlags[] = "--expose-gc";
         v8::V8::SetFlagsFromString(GCFlags, sizeof(GCFlags));
         PostEngineInitHandle = FCoreDelegates::OnPostEngineInit.AddRaw(this, &FPuertsEditorPluginState::OnPostEngineInit);
+        EnginePreExitHandle = FCoreDelegates::OnEnginePreExit.AddRaw(this, &FPuertsEditorPluginState::Shutdown);
         RuntimeHotReloadManager = MakeUnique<FPuertsRuntimeHotReloadManager>();
         RuntimeHotReloadManager->Startup();
     }
 
     void Shutdown()
     {
+        if (bShutdown)
+        {
+            return;
+        }
+        bShutdown = true;
+
+        if (EnginePreExitHandle.IsValid())
+        {
+            FCoreDelegates::OnEnginePreExit.Remove(EnginePreExitHandle);
+            EnginePreExitHandle.Reset();
+        }
+
         if (RuntimeHotReloadManager)
         {
             RuntimeHotReloadManager->Shutdown();
@@ -283,11 +296,13 @@ private:
     std::shared_ptr<puerts::FSourceFileWatcher> SourceFileWatcher;
     TUniquePtr<FAutoConsoleCommand> RestartConsoleCommand;
     FDelegateHandle PostEngineInitHandle;
+    FDelegateHandle EnginePreExitHandle;
     FDelegateHandle MapChangedHandle;
     FTSTicker::FDelegateHandle TickerHandle;
     bool bPostEngineInitialized = false;
     bool bStartupScriptCalled = false;
     bool bToolMenuHandlerRegistered = false;
+    bool bShutdown = false;
     TUniquePtr<FPuertsRuntimeHotReloadManager> RuntimeHotReloadManager;
 };
 
