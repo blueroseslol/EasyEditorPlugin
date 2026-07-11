@@ -170,6 +170,10 @@ bool FPuertsExplicitAndPackageTest::RunTest(const FString& Parameters)
     TestTrue(TEXT("explicit json resolves"), Search(Loader, TEXT(""), TEXT("config.json"), Path));
     TestTrue(TEXT("package metadata is returned to Puerts"), Search(Loader, TEXT(""), TEXT("with-main"), Path));
     TestTrue(TEXT("package.json selected"), Path.EndsWith(TEXT("with-main/package.json")));
+    const FString PackageDirectory = FPaths::GetPath(Path);
+    TestTrue(TEXT("package main is resolved relative to package directory"),
+        Search(Loader, PackageDirectory, TEXT("dist/main.js"), Path));
+    TestTrue(TEXT("package main selected"), Path.EndsWith(TEXT("with-main/dist/main.js")));
     TestTrue(TEXT("index fallback resolves"), Search(Loader, TEXT(""), TEXT("with-index"), Path));
     TestTrue(TEXT("index.js selected"), Path.EndsWith(TEXT("with-index/index.js")));
     TestFalse(TEXT("json is not inferred"), Search(Loader, TEXT(""), TEXT("config"), Path));

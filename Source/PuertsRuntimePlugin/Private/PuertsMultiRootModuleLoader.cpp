@@ -52,7 +52,13 @@ bool FPuertsMultiRootModuleLoader::Search(
     {
         if (!RequiredDir.IsEmpty())
         {
-            bFound = SearchNodeModulesUpward(RequiredDir, RequiredModule, Path, AbsolutePath);
+            // Puerts passes package.json "main" values without a leading "./".
+            // Resolve those against the package directory before applying bare-module lookup.
+            bFound = SearchFromDirectory(RequiredDir, RequiredModule, false, Path, AbsolutePath);
+            if (!bFound)
+            {
+                bFound = SearchNodeModulesUpward(RequiredDir, RequiredModule, Path, AbsolutePath);
+            }
         }
 
         for (int32 RootIndex = 0; !bFound && RootIndex < Roots.Num(); ++RootIndex)
