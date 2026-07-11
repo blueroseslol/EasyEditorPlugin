@@ -79,6 +79,8 @@ installGameplay(GameInstance);
 
 `PuertsEditorPlugin` 接管原 `EasyEditorPlugin` 模块中的 Slate、ToolMenus、Content Browser 和控制台绑定，继续维持独立的编辑器工具 VM。编辑器入口改为插件包子模块 `@matrix/puerts-runtime/EditorMain`，避免与 gameplay 的项目入口 `Main` 混用。第一阶段热重载只承诺 TypeScript CommonJS 输出的 `.js` 文件；`.mjs`、`.cjs` 与字节码仍可加载，但不承诺 watcher reload。
 
+Puerts 在读取 `package.json` 后会把 `main` 值再次交给 loader，并以包目录作为 `RequiredDir`；即使 `main` 没有 `./` 前缀，也必须先按包目录相对路径解析。插件和项目 `Content/JavaScript` 都需要显式作为 NonUFS loose files staging，项目入口不能依赖 Content 自动收集。
+
 编辑器模块复用 `FPuertsMultiRootModuleLoader`，监听其实际加载的绝对文件路径。文件变化时，仅对拥有该文件的 VM 调用 `ReloadSource`。`PuertsRuntime.Restart` 重启当前 PIE/Standalone game instance 的 gameplay VM；`PuertsEditor.Restart` 重启编辑器工具 VM。所有 delegate、ticker、console command 和 watcher handle 在关闭模块或 VM 时成对注销。
 
 ## 构建与打包
