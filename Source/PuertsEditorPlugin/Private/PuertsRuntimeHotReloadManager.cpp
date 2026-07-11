@@ -51,6 +51,7 @@ void FPuertsRuntimeHotReloadManager::Shutdown()
         if (UPuertsRuntimeGameInstanceSubsystem* Runtime = Pair.Key.Get())
         {
             Runtime->OnSourceLoaded().Remove(Pair.Value.SourceLoadedHandle);
+            Runtime->OnSourcesReset().Remove(Pair.Value.SourcesResetHandle);
         }
     }
     Watchers.Empty();
@@ -65,6 +66,16 @@ void FPuertsRuntimeHotReloadManager::Attach(UPuertsRuntimeGameInstanceSubsystem*
 
     const TWeakObjectPtr<UPuertsRuntimeGameInstanceSubsystem> WeakRuntime(Runtime);
     FRuntimeWatcher RuntimeWatcher;
+    RuntimeWatcher.SourcesResetHandle = Runtime->OnSourcesReset().AddRaw(
+        this, &FPuertsRuntimeHotReloadManager::ResetWatcher);
+    FRuntimeWatcher& StoredWatcher = Watchers.Add(WeakRuntime, MoveTemp(RuntimeWatcher));
+    InitializeWatcher(Runtime, StoredWatcher);
+}
+
+void FPuertsRuntimeHotReloadManager::InitializeWatcher(
+    UPuertsRuntimeGameInstanceSubsystem* Runtime, FRuntimeWatcher& RuntimeWatcher)
+{
+    const TWeakObjectPtr<UPuertsRuntimeGameInstanceSubsystem> WeakRuntime(Runtime);
     RuntimeWatcher.Watcher = MakeShared<puerts::FSourceFileWatcher>([WeakRuntime](const FString& Path) {
         const FString CanonicalPath = FPuertsMultiRootModuleLoader::CanonicalizePath(Path);
         auto Reload = [WeakRuntime, CanonicalPath]() {
@@ -95,13 +106,22 @@ void FPuertsRuntimeHotReloadManager::Attach(UPuertsRuntimeGameInstanceSubsystem*
         }
     });
 
-    FRuntimeWatcher& StoredWatcher = Watchers.Add(WeakRuntime, MoveTemp(RuntimeWatcher));
     for (const FString& Path : Runtime->GetLoadedSourcePaths())
     {
         if (FPaths::GetExtension(Path).Equals(TEXT("js"), ESearchCase::IgnoreCase))
         {
-            StoredWatcher.Watcher->OnSourceLoaded(FPuertsMultiRootModuleLoader::CanonicalizePath(Path));
+            RuntimeWatcher.Watcher->OnSourceLoaded(FPuertsMultiRootModuleLoader::CanonicalizePath(Path));
         }
+    }
+}
+
+void FPuertsRuntimeHotReloadManager::ResetWatcher(UPuertsRuntimeGameInstanceSubsystem* Runtime)
+{
+    if (FRuntimeWatcher* RuntimeWatcher = Watchers.Find(Runtime))
+    {
+        Runtime->OnSourceLoaded().Remove(RuntimeWatcher->SourceLoadedHandle);
+        RuntimeWatcher->Watcher.Reset();
+        InitializeWatcher(Runtime, *RuntimeWatcher);
     }
 }
 
@@ -115,6 +135,7 @@ void FPuertsRuntimeHotReloadManager::Detach(UPuertsRuntimeGameInstanceSubsystem*
     if (FRuntimeWatcher* RuntimeWatcher = Watchers.Find(Runtime))
     {
         Runtime->OnSourceLoaded().Remove(RuntimeWatcher->SourceLoadedHandle);
+        Runtime->OnSourcesReset().Remove(RuntimeWatcher->SourcesResetHandle);
         Watchers.Remove(Runtime);
     }
 }

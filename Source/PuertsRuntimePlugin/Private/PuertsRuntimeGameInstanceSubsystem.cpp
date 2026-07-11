@@ -63,11 +63,13 @@ void UPuertsRuntimeGameInstanceSubsystem::StopRuntime()
         RuntimeHost->Stop();
     }
     LoadedSourcePaths.Reset();
+    SourcesResetEvent.Broadcast(this);
 }
 
 bool UPuertsRuntimeGameInstanceSubsystem::RestartRuntime()
 {
     LoadedSourcePaths.Reset();
+    SourcesResetEvent.Broadcast(this);
     return RuntimeHost && RuntimeHost->Restart();
 }
 

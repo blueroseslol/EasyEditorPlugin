@@ -6,7 +6,9 @@
 
 #include "PuertsRuntimeGameInstanceSubsystem.generated.h"
 
+class UPuertsRuntimeGameInstanceSubsystem;
 DECLARE_MULTICAST_DELEGATE_OneParam(FPuertsRuntimeSourceLoaded, const FString&);
+DECLARE_MULTICAST_DELEGATE_OneParam(FPuertsRuntimeSourcesReset, UPuertsRuntimeGameInstanceSubsystem*);
 
 class FPuertsRuntimeHost;
 
@@ -28,6 +30,7 @@ public:
 
     const TSet<FString>& GetLoadedSourcePaths() const { return LoadedSourcePaths; }
     FPuertsRuntimeSourceLoaded& OnSourceLoaded() { return SourceLoadedEvent; }
+    FPuertsRuntimeSourcesReset& OnSourcesReset() { return SourcesResetEvent; }
 
 private:
     TArray<FPuertsScriptRoot> BuildScriptRoots() const;
@@ -35,4 +38,5 @@ private:
     TUniquePtr<FPuertsRuntimeHost> RuntimeHost;
     TSet<FString> LoadedSourcePaths;
     FPuertsRuntimeSourceLoaded SourceLoadedEvent;
+    FPuertsRuntimeSourcesReset SourcesResetEvent;
 };

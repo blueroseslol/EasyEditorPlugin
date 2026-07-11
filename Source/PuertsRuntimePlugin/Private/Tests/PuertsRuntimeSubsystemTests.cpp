@@ -119,4 +119,22 @@ bool FPuertsRuntimeSubsystemTypeTest::RunTest(const FString& Parameters)
     return true;
 }
 
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FPuertsRuntimeSourcesResetTest, "PuertsRuntimePlugin.Subsystem.StopAndRestartResetSources",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+
+bool FPuertsRuntimeSourcesResetTest::RunTest(const FString& Parameters)
+{
+    UGameInstance* GameInstance = NewObject<UGameInstance>();
+    UPuertsRuntimeGameInstanceSubsystem* Runtime =
+        NewObject<UPuertsRuntimeGameInstanceSubsystem>(GameInstance);
+    int32 ResetCount = 0;
+    Runtime->OnSourcesReset().AddLambda([&ResetCount](UPuertsRuntimeGameInstanceSubsystem*) { ++ResetCount; });
+
+    Runtime->StopRuntime();
+    TestEqual(TEXT("stop resets watched sources"), ResetCount, 1);
+    TestFalse(TEXT("restart without a host fails"), Runtime->RestartRuntime());
+    TestEqual(TEXT("restart resets watched sources"), ResetCount, 2);
+    return true;
+}
+
 #endif
