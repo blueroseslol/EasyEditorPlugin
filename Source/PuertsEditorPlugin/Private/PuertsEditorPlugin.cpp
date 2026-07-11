@@ -1,6 +1,7 @@
 #include "PuertsEditorPlugin.h"
 
 #include "PuertsEditorEnvironment.h"
+#include "PuertsRuntimeHotReloadManager.h"
 #include "Binding.hpp"
 #include "Containers/Ticker.h"
 #include "ContentBrowserItem.h"
@@ -89,10 +90,18 @@ public:
         char GCFlags[] = "--expose-gc";
         v8::V8::SetFlagsFromString(GCFlags, sizeof(GCFlags));
         PostEngineInitHandle = FCoreDelegates::OnPostEngineInit.AddRaw(this, &FPuertsEditorPluginState::OnPostEngineInit);
+        RuntimeHotReloadManager = MakeUnique<FPuertsRuntimeHotReloadManager>();
+        RuntimeHotReloadManager->Startup();
     }
 
     void Shutdown()
     {
+        if (RuntimeHotReloadManager)
+        {
+            RuntimeHotReloadManager->Shutdown();
+            RuntimeHotReloadManager.Reset();
+        }
+
         if (PostEngineInitHandle.IsValid())
         {
             FCoreDelegates::OnPostEngineInit.Remove(PostEngineInitHandle);
@@ -279,6 +288,7 @@ private:
     bool bPostEngineInitialized = false;
     bool bStartupScriptCalled = false;
     bool bToolMenuHandlerRegistered = false;
+    TUniquePtr<FPuertsRuntimeHotReloadManager> RuntimeHotReloadManager;
 };
 
 struct EasyEditorPlugin
