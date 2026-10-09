@@ -1,5 +1,7 @@
 # EasyEditorPlugin
 
+插件 Runtime TypeScript 的单配置接入、实时编译及链接插件支持，见 [最简集成说明](EasyEditorRuntime.md)。
+
 ## EasyEditorPlugin是什么
 
 EasyEditorPlugin是一个UE下快速开发编辑器扩展的插件，其特点：
